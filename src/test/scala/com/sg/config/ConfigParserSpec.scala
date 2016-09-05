@@ -1,5 +1,7 @@
 package com.sg.config
 
+import java.io.FileNotFoundException
+
 import org.scalatest._
 
 import scala.io.Source
@@ -42,4 +44,18 @@ class ConfigParserSpec extends FlatSpec with Matchers {
     val filePath = Source.getClass().getResource("/test_config_error.txt")
     an [IllegalArgumentException] should be thrownBy ConfigParser.parseConfig(filePath.getFile)
   }
+
+  "ConfigParser" should "throw an exception if the config file does not exist" in {
+    an [FileNotFoundException]  should be thrownBy ConfigParser.parseConfig("/blah")
+  }
+
+  "ConfigParser" should "ignore not well formed settings" in {
+    val filePath = Source.getClass().getResource("/test_config_with_comment_error.txt")
+    val configMap = ConfigParser.parseConfig(filePath.getFile, List("staging"))
+    val httpConfig = configMap("http")
+    httpConfig.get("test") shouldBe None
+    httpConfig.get("test;") shouldBe None
+
+  }
+
 }

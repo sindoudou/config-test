@@ -1,0 +1,7 @@
+[http]
+name = "http uploading"
+path = /tmp/
+path<production> = /srv/var/tmp/
+path<staging> = /srv/uploads/; This is another comment
+params = array,of,values
+test;=value incorrect

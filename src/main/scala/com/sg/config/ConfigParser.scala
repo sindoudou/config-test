@@ -18,7 +18,8 @@ object ConfigParser extends Sanitizer with LazyLogging {
     val configMap = mutable.LinkedHashMap[Group, mutable.Map[Setting, Any]]()
 
     for (line <- Source.fromFile(filePath).getLines()) {
-      line match {
+      val lineWithoutComment = line.split(";")(0)
+      lineWithoutComment match {
         case groupRegexp(group)  =>
           configMap(group) = mutable.Map[Setting, Any]()
         case settingRegexp(name, value) =>
