@@ -55,7 +55,11 @@ class ConfigParserSpec extends FlatSpec with Matchers {
     val httpConfig = configMap("http")
     httpConfig.get("test") shouldBe None
     httpConfig.get("test;") shouldBe None
-
   }
 
+  "ConfigParser" should "not handle ';' as a comment if it is part of a value" in {
+    val filePath = Source.getClass().getResource("/test_config")
+    val configMap = ConfigParser.parseConfig(filePath.getFile)
+    configMap("http")("name2") shouldBe "\"hello there; http uploading\""
+  }
 }

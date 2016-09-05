@@ -61,7 +61,11 @@ class SanitizerSpec extends FlatSpec with Matchers {
     sanitizer.sanitize("yes; This is another comment") shouldBe true
   }
 
-  "Sanitizer" should ";" in {
+  "Sanitizer" should "return empty if no value;" in {
     sanitizer.sanitize("; This is another comment") shouldBe ""
+  }
+
+  "Sanitizer" should "not handle ';' as comment if it is surrounded by quotes" in {
+    sanitizer.sanitize("\"Hello; This is not a comment\"") shouldBe "\"Hello; This is not a comment\""
   }
 }

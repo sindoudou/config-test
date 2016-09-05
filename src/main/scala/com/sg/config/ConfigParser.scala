@@ -18,20 +18,21 @@ object ConfigParser extends Sanitizer with LazyLogging {
     val configMap = mutable.LinkedHashMap[Group, mutable.Map[Setting, Any]]()
 
     for (line <- Source.fromFile(filePath).getLines()) {
-      val lineWithoutComment = line.split(";")(0)
-      lineWithoutComment match {
+      line match {
         case groupRegexp(group)  =>
           configMap(group) = mutable.Map[Setting, Any]()
         case settingRegexp(name, value) =>
           name.trim() match {
-            case overriddenRegexp(settingName, overrideValue) =>
+            case overriddenRegexp(settingName, overrideValue) if !settingName.contains(";") =>
               if (overrides.isEmpty || overrides.contains(overrideValue)) {
                 val groupMap = configMap.lastOption.getOrElse(throw new IllegalArgumentException("No group found for setting"))
                 groupMap._2 += (settingName.trim -> sanitize(value.trim))
               }
-            case _ =>
+            case settingName if !settingName.contains(";") =>
               val groupMap = configMap.lastOption.getOrElse(throw new IllegalArgumentException("No group found for setting"))
               groupMap._2 += (name.trim -> sanitize(value.trim))
+            case _ =>
+              logger.warn(s"Ignoring setting with comments for $name")
           }
 
         case _ => logger.warn(s"Ignoring config for $line")
